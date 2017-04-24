@@ -1,7 +1,10 @@
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier
 from imageReading import ImageReader
+from sklearn import tree
+from sklearn.naive_bayes import GaussianNB
 import math
 from sklearn.preprocessing import LabelBinarizer
 
@@ -17,7 +20,7 @@ testSetRemember = []
 testSetAll = []
 
 
-for i in range(0,10):
+for i in range(len(array)):
     input = array[i] + "/"
     reader.readImage(input)
     print(len(reader.imageVector))
@@ -33,11 +36,16 @@ for i in range(0,10):
 
 
 #classif = OneVsRestClassifier(estimator=SVC(random_state=0))
-classif = OneVsRestClassifier(LinearSVC(C=100.)).fit(X, y)
+#classif = OneVsRestClassifier(LinearSVC(C=100.)).fit(X, y)
+#clf = RandomForestClassifier(n_estimators=40)
+#clf = GaussianNB()
+clf = tree.DecisionTreeClassifier()
+clf.fit(X, y)
+
 print("built model")
 #classif.fit(X, y).predict(X)
 print("going for prediction")
-results = classif.predict(testSetAll)
+results = clf.predict(testSetAll)
 missedCount = 0
 length = len(results)
 for i in range(len(results)):
