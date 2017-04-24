@@ -16,7 +16,7 @@ class ImageReader:
         count = 0
         while(nextImage):
             try:
-                lett = "a_" + str(count) + ".jpg"
+                lett = letter[0] + "_" + str(count) + ".jpg"
                 newSource = source
                 newSource += lett
                 im = Image.open(newSource)
@@ -33,9 +33,12 @@ class ImageReader:
 
             count += 1
 
+    def clearVector(self):
+        self.imageVector = []
+
 
 reader = ImageReader("/Users/simenhellem/Documents/chars74k-lite/")
-reader.readImage("a/")
+reader.readImage("c/")
 
 
 
