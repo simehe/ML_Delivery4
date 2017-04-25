@@ -15,6 +15,10 @@ THRESHOLD_CONSIDERED_WHITE = 0.6  # Pixels with value greater than this value ar
 
 def digitalImagePrep(image, image_name):
     # Feature scaling
+    print (image)
+    for i in range(len(image)):
+    	for j in range(len(image[i])):
+    		image[i][j] = float(image[i][j])
     image = image / 255
 
     # Adding contrast to the image
@@ -77,6 +81,7 @@ def shareOfWhitePixels(image, image_name):
 
 
 def get_image_size(fname):
+
     return 20, 20
 
 
@@ -110,7 +115,7 @@ def main():
         try:
             os.makedirs(saveDestination)
         except OSError as exception:
-            print "\nBE CAREFUL! Directory %s already exists." % saveDestination
+            print ("\nBE CAREFUL! Directory %s already exists." % saveDestination)
         for i in range(len(images)):  # Here, I want modify and save each image
             fname = c + "_" + str(i) + ".jpg"
             prepped = digitalImagePrep(images[i], fname)  # Image preprocessing
