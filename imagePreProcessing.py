@@ -6,34 +6,63 @@ from PIL import Image
 import numpy as np
 import string
 from imageReading import ImageReader
+from scipy import ndimage as ndi
+from skimage import feature
+from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral,
+                                 denoise_wavelet, estimate_sigma)
+from skimage.filters import roberts, sobel, scharr, prewitt
 
 INVERSION_THRESHOLD_FRAME = 0.5  # If the share of white pixels in the image frame is larger than this, we invert the image
 INVERSION_THRESHOLD_CONTENT = 0.55  # If the share of white pixels in the image is larger than this, we invert the image
 FAIR_AMOUNT_OF_WHITE_PIXELS = 0.5  # If the share of white pixels in the image is larger than this, we consider the letter too close-up and we add a
 THRESHOLD_CONSIDERED_WHITE = 0.6  # Pixels with value greater than this value are considered white
-
+THRESHOLD_CONSIDERED_SHARP = 0.8
+THRESHOLD_CONSIDERED_BLURRY = 0.2
 
 def digitalImagePrep(image, image_name):
-    # Feature scaling
-    print (image)
-    for i in range(len(image)):
-    	for j in range(len(image[i])):
-    		image[i][j] = float(image[i][j])
-    image = image / 255
+	# Feature scaling
+	#print (image)
+	for i in range(len(image)):
+		for j in range(len(image[i])):
+			image[i][j] = float(image[i][j])
+    
+	image = image / 255
+    
+	# Adding contrast to the image
+	image = increaseContrast(image)
 
-    # Adding contrast to the image
-    image = increaseContrast(image)
 
-    print ("")
-    print (image_name, shareOfWhitePixels(image, image_name), shareOfWhiteFramePixels(image, image_name))
-    print(shareOfWhitePixels(image, image_name) > INVERSION_THRESHOLD_CONTENT)
+	# Compute the Canny filter for two values of sigma
+	edges1 = sobel(image)
+	edges2 = feature.canny(image, sigma=3)
 
-    # Invert image if necessary
-    if shareOfWhiteFramePixels(image, image_name) > INVERSION_THRESHOLD_FRAME or shareOfWhitePixels(image,
-                                                                                                    image_name) > INVERSION_THRESHOLD_CONTENT:
-        image = invert(image)
+	# Computing the magnitude of the sharpest edge
+	sharpestEdge = 0.0
+	for i in edges1:
+		for j in i:
+			if(sharpestEdge<j):
+				sharpestEdge = j
+	
+	print ("Sharpest edge", sharpestEdge)
+	#sharpestEdge = max(edges1)
+	#sharpestEdge2 = max(edges2)
 
-    return image
+
+	if sharpestEdge > THRESHOLD_CONSIDERED_SHARP:
+		image = smoothen(image)
+
+	if sharpestEdge < THRESHOLD_CONSIDERED_BLURRY:
+		image = sharpen(image)
+
+	print ("")
+	print (image_name, shareOfWhitePixels(image, image_name), shareOfWhiteFramePixels(image, image_name))
+	print(shareOfWhitePixels(image, image_name) > INVERSION_THRESHOLD_CONTENT)
+
+	# Invert image if necessary
+	if shareOfWhiteFramePixels(image, image_name) > INVERSION_THRESHOLD_FRAME or shareOfWhitePixels(image, image_name) > INVERSION_THRESHOLD_CONTENT:
+		image = invert(image)
+
+	return image
 
 
 def invert(image):
@@ -108,7 +137,7 @@ def main():
     chars = string.ascii_lowercase[:]  # List of chars a-z
     reader = ImageReader("chars74k-lite/")
 
-    for c in chars[2:3]:
+    for c in chars[:]:
         reader.readImage(c + "/")
         images = reader.imageHolder
         saveDestination = "mlImageHolder/" + c
