@@ -19,7 +19,7 @@ ARRAY = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "
 TESTSET = 0.2
 y = []
 X = []
-reader = ImageReader("/Users/simenhellem/Documents/chars74k-lite/")
+reader = ImageReader("mlImageHolder/")
 
 
 ## FOR TESTING ###
@@ -59,9 +59,9 @@ prepareTrainandTestSet()
 ### DIFFERENT CLASSIFIERS ###
 #clf = OneVsRestClassifier(estimator=SVC(random_state=0))
 #clf = OneVsRestClassifier(LinearSVC(C=100.)).fit(X, y)
-#clf = RandomForestClassifier(n_estimators=40)
+clf = RandomForestClassifier(n_estimators=40)
 #clf = GaussianNB()
-clf = tree.DecisionTreeClassifier()
+#clf = tree.DecisionTreeClassifier()
 
 ### FIT TO TRAINING DATA ###
 clf.fit(X, y)
