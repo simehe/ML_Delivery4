@@ -1,5 +1,6 @@
 from imageReading import ImageReader
 import math
+from sklearn import preprocessing
 
 ### ONE VS REST ###
 from sklearn.multiclass import OneVsRestClassifier
@@ -27,6 +28,8 @@ testSetRemember = []
 testSetAll = []
 
 def prepareTrainandTestSet():
+    global X
+    global testSetAll
     for i in range(len(ARRAY)):
         input = ARRAY[i] + "/"
         reader.readImage(input)
@@ -40,6 +43,10 @@ def prepareTrainandTestSet():
                 testSetAll.append(reader.imageVector[j])
                 testSetRemember.append(i)
         reader.clearVector()
+    #scaler = preprocessing.StandardScaler().fit(X)
+    #X = scaler.transform(X)
+    #X = preprocessing.scale(X)
+    #testSetAll = scaler.transform(testSetAll)
 
 
 def classify():
@@ -50,18 +57,18 @@ def classify():
             print("You thought it was", results[i])
             print("But it was:", testSetRemember[i])
             missedCount += 1
-    total = float(missedCount) / float(len(results))
-    print("you missed: ", total)
+    total = 1 - (float(missedCount) / float(len(results)))
+    print("you hit: ", total)
 
 
 prepareTrainandTestSet()
 
 ### DIFFERENT CLASSIFIERS ###
 #clf = OneVsRestClassifier(estimator=SVC(random_state=0))
-#clf = OneVsRestClassifier(LinearSVC(C=100.)).fit(X, y)
-clf = RandomForestClassifier(n_estimators=40)
+#clf = OneVsRestClassifier(LinearSVC(C=100.))
+#clf = RandomForestClassifier(n_estimators=200)
 #clf = GaussianNB()
-#clf = tree.DecisionTreeClassifier()
+clf = tree.DecisionTreeClassifier()
 
 ### FIT TO TRAINING DATA ###
 clf.fit(X, y)
