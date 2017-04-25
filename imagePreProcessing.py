@@ -103,7 +103,7 @@ def main():
 		reader.readImage(c + "/")
 
 		images = reader.getImageVector() # This returns an empty list. Why?
-
+		print(images)
 		for i in range(len(images)): # Here, I want modify and save each image
 			fname = c + "_" + i + ".jpg"
 			prepped = digitalImagePrep(images[i], fname) # Image preprocessing
