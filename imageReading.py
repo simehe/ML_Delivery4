@@ -33,6 +33,8 @@ class ImageReader:
 
             count += 1
 
+    def getImageVector(self):
+        return self.imageVector
     def clearVector(self):
         self.imageVector = []
 
