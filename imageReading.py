@@ -12,6 +12,7 @@ class ImageReader:
         self.sizeY = 20
         self.imageVector = []
         self.imageHolder = []
+        self.imageMatrix = []
 
     def readImage(self, letter):
         source = self.imageFolder + letter
@@ -38,13 +39,32 @@ class ImageReader:
 
             count += 1
 
+    def readImageFromFileName(self, fileName):
+        source = self.imageFolder
+        try:
+            imagePath = source + fileName
+            im = Image.open(imagePath)
+            pix = im.load()
+            width, height = im.size
+            self.sizeX = width
+            self.sizeY = height
+            imageMatrix = []
+            for i in range(height):
+                imageRow = []
+                for j in range(width):
+                    imageRow.append(pix[j, i])
+                imageMatrix.append(imageRow)
+            self.imageMatrix = imageMatrix
+        except IOError:
+            nextImage = False
+
+
     def clearVector(self):
         self.imageVector = []
         self.imageHolder = []
 
 
-reader = ImageReader("chars74k-lite/")
-reader.readImage("c/")
+
 
 
 

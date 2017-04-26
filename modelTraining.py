@@ -49,24 +49,21 @@ def prepareTrainandTestSet():
     #testSetAll = scaler.transform(testSetAll)
 
 
-def classify():
+def classify(clf):
     results = clf.predict(testSetAll)
     missedCount = 0
     for i in range(len(results)):
         if results[i] != testSetRemember[i]:
-            print("You thought it was", results[i])
-            print("But it was:", testSetRemember[i])
+            #print("You thought it was", results[i])
+            #print("But it was:", testSetRemember[i])
             missedCount += 1
     total = 1 - (float(missedCount) / float(len(results)))
     print("you hit: ", total)
 
 
-def classifyFromImageVector(imageVector):
-    results = clf.predict([imageVector])
-    print results
 
-
-def test():
+def train():
+    print "building model"
 
     prepareTrainandTestSet()
 
@@ -80,14 +77,16 @@ def test():
     ### FIT TO TRAINING DATA ###
     clf.fit(X, y)
 
-    print("built model")
+    print "model finished"
+    return clf
+
+def test(clf):
     print("going for prediction")
 
     ### TEST ON TEST SET ###
-    classify()
+    classify(clf)
 
-
-#test()
+#train()
 
 
 

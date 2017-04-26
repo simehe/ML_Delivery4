@@ -16,15 +16,14 @@ THRESHOLD_CONSIDERED_WHITE = 0.6  # Pixels with value greater than this value ar
 def digitalImagePrep(image, image_name):
     # Feature scaling
     image = image / float(255)
-
     # Adding contrast to the image
     image = increaseContrast(image)
     image = smoothen(image)
     #image = sharpen(image)
 
-    print ("")
-    print (image_name, shareOfWhitePixels(image, image_name), shareOfWhiteFramePixels(image, image_name))
-    print(shareOfWhitePixels(image, image_name) > INVERSION_THRESHOLD_CONTENT)
+    #print ("")
+    #print (image_name, shareOfWhitePixels(image, image_name), shareOfWhiteFramePixels(image, image_name))
+    #print(shareOfWhitePixels(image, image_name) > INVERSION_THRESHOLD_CONTENT)
 
     # Invert image if necessary
     if shareOfWhiteFramePixels(image, image_name) > INVERSION_THRESHOLD_FRAME or shareOfWhitePixels(image,
@@ -115,6 +114,7 @@ def main():
             print "\nBE CAREFUL! Directory %s already exists." % saveDestination
         for i in range(len(images)):  # Here, I want modify and save each image
             fname = c + "_" + str(i) + ".jpg"
+            #print type(images[i])
             prepped = digitalImagePrep(images[i], fname)  # Image preprocessing
             saveDestination = "mlImageHolder/" + c + "/" + fname
             io.imsave(saveDestination, prepped)
@@ -122,4 +122,4 @@ def main():
         reader.clearVector()
 
 
-main()
+#main()
