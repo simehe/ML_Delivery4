@@ -1,26 +1,42 @@
 import skimage
 import os
 from skimage import io
+import random
 from skimage import filters
 from PIL import Image
 import numpy as np
 import string
 from imageReading import ImageReader
+from scipy import ndimage as ndi
+from skimage import feature
+from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral,
+                                 denoise_wavelet, estimate_sigma)
+from skimage.filters import roberts, sobel, scharr, prewitt
 
 INVERSION_THRESHOLD_FRAME = 0.5  # If the share of white pixels in the image frame is larger than this, we invert the image
 INVERSION_THRESHOLD_CONTENT = 0.55  # If the share of white pixels in the image is larger than this, we invert the image
 FAIR_AMOUNT_OF_WHITE_PIXELS = 0.5  # If the share of white pixels in the image is larger than this, we consider the letter too close-up and we add a
 THRESHOLD_CONSIDERED_WHITE = 0.6  # Pixels with value greater than this value are considered white
+THRESHOLD_CONSIDERED_SHARP = 0.8
+THRESHOLD_CONSIDERED_BLURRY = 0.2
+TRAININGSET = 0.8
 
 
-def digitalImagePrep(image, image_name):
+def digitalImagePrep(image, image_name, mode):
     # Feature scaling
+    # print (image)
+
     image = image / float(255)
 
     # Adding contrast to the image
     image = increaseContrast(image)
-    image = smoothen(image)
-    #image = sharpen(image)
+
+    # Augment the picture, dependent on mode
+    if (mode == 0):
+        image = smoothen(image)
+    elif(mode == 1):
+        image = sharpen(image)
+
 
     print ("")
     print (image_name, shareOfWhitePixels(image, image_name), shareOfWhiteFramePixels(image, image_name))
@@ -109,16 +125,39 @@ def main():
         reader.readImage(c + "/")
         images = reader.imageHolder
         saveDestination = "mlImageHolder/" + c
+        saveDestination2 = "mlImageHolder/" + c + "/" + "test"
         try:
             os.makedirs(saveDestination)
         except OSError as exception:
             print "\nBE CAREFUL! Directory %s already exists." % saveDestination
-        for i in range(len(images)):  # Here, I want modify and save each image
-            fname = c + "_" + str(i) + ".jpg"
-            prepped = digitalImagePrep(images[i], fname)  # Image preprocessing
-            saveDestination = "mlImageHolder/" + c + "/" + fname
+        try:
+            os.makedirs(saveDestination2)
+        except OSError as exception:
+            print "\nBE CAREFUL! Directory %s already exists." % saveDestination2
+        counter = 0
+        numberOfTrainingImages = int(len(images) * TRAININGSET)
+        for i in range(numberOfTrainingImages):  # Here, I want modify and save each image
+            fname1 = c + "_" + str(counter) + ".jpg"
+            counter += 1
+            fname2  = c + "_" + str(counter) + ".jpg"
+            counter += 1
+            fname3 = c + "_" + str(counter) + ".jpg"
+            counter += 1
+            prepped = digitalImagePrep(images[i], fname1, 0)  # Image preprocessing
+            prepped2 = digitalImagePrep(images[i], fname2, 1)
+            prepped3 = digitalImagePrep(images[i], fname3, 2)
+            saveDestination1 = "mlImageHolder/" + c + "/" + fname1
+            saveDestination2 = "mlImageHolder/" + c + "/" + fname2
+            saveDestination3 = "mlImageHolder/" + c + "/" + fname3
+            io.imsave(saveDestination1, prepped)
+            io.imsave(saveDestination2, prepped2)
+            io.imsave(saveDestination3, prepped3)
+        for i in range(numberOfTrainingImages, len(images)):
+            fname = c + "_" + str(counter) + ".jpg"
+            counter += 1
+            prepped = digitalImagePrep(images[i], fname, 2)
+            saveDestination = "mlImageHolder/" + c + "/" + "test" + "/" + fname
             io.imsave(saveDestination, prepped)
-
         reader.clearVector()
 
 

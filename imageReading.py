@@ -10,22 +10,21 @@ class ImageReader:
         self.imageFolder = imageFolder
         self.sizeX = 20
         self.sizeY = 20
+        self.count = 0
         self.imageVector = []
         self.imageHolder = []
 
     def readImage(self, letter):
         source = self.imageFolder + letter
         nextImage = True
-        count = 0
+        count = self.count
         while(nextImage):
             try:
                 lett = letter[0] + "_" + str(count) + ".jpg"
                 newSource = source
                 newSource += lett
                 image = io.imread(newSource)
-                #im = Image.open(newSource)
                 self.imageHolder.append(image)
-                #pix = im.load()
                 imageList = []
                 for i in range(self.sizeX):
                     for j in range(self.sizeY):
