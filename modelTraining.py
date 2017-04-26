@@ -61,25 +61,33 @@ def classify():
     print("you hit: ", total)
 
 
-prepareTrainandTestSet()
-
-### DIFFERENT CLASSIFIERS ###
-#clf = OneVsRestClassifier(estimator=SVC(random_state=0))
-#clf = OneVsRestClassifier(LinearSVC(C=100.))
-#clf = RandomForestClassifier(n_estimators=200)
-#clf = GaussianNB()
-clf = tree.DecisionTreeClassifier()
-
-### FIT TO TRAINING DATA ###
-clf.fit(X, y)
-
-print("built model")
-print("going for prediction")
-
-### TEST ON TEST SET ###
-classify()
+def classifyFromImageVector(imageVector):
+    results = clf.predict([imageVector])
+    print results
 
 
+def test():
+
+    prepareTrainandTestSet()
+
+    ### DIFFERENT CLASSIFIERS ###
+    #clf = OneVsRestClassifier(estimator=SVC(random_state=0))
+    #clf = OneVsRestClassifier(LinearSVC(C=100.))
+    clf = RandomForestClassifier(n_estimators=200)
+    #clf = GaussianNB()
+    #clf = tree.DecisionTreeClassifier()
+
+    ### FIT TO TRAINING DATA ###
+    clf.fit(X, y)
+
+    print("built model")
+    print("going for prediction")
+
+    ### TEST ON TEST SET ###
+    classify()
+
+
+#test()
 
 
 
