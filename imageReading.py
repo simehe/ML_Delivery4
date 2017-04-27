@@ -1,4 +1,6 @@
 from PIL import Image
+import skimage
+from skimage import io
 
 ### After reading, all images can be feetched from the imageVector ###
 
@@ -8,23 +10,25 @@ class ImageReader:
         self.imageFolder = imageFolder
         self.sizeX = 20
         self.sizeY = 20
+        self.count = 0
         self.imageVector = []
+        self.imageHolder = []
 
     def readImage(self, letter):
         source = self.imageFolder + letter
         nextImage = True
-        count = 0
+        count = self.count
         while(nextImage):
             try:
                 lett = letter[0] + "_" + str(count) + ".jpg"
                 newSource = source
                 newSource += lett
-                im = Image.open(newSource)
-                pix = im.load()
+                image = io.imread(newSource)
+                self.imageHolder.append(image)
                 imageList = []
                 for i in range(self.sizeX):
                     for j in range(self.sizeY):
-                        imageList.append(pix[i, j])
+                        imageList.append(image[i, j])
                 self.imageVector.append(imageList)
 
             except IOError:
@@ -35,10 +39,12 @@ class ImageReader:
 
     def clearVector(self):
         self.imageVector = []
+        self.imageHolder = []
 
 
-reader = ImageReader("/Users/simenhellem/Documents/chars74k-lite/")
+reader = ImageReader("chars74k-lite/")
 reader.readImage("c/")
+
 
 
 
