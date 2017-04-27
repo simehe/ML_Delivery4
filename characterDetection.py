@@ -16,15 +16,15 @@ reader.readImageFromFileName(imageName)
 
 patchSize = 20 #x20
 #print reader.imageVector
-numberToDetect = 15
+numberToDetect = 6
 
 #bruk classify som tar inn imageMatrix og returnerer et element i ARRAY
 
 outputPic  = deepcopy(reader.imageMatrix)
 clf = modelTraining.train()
 
-def slidingWindowDetection(clf,imageMatrix,outputPic):
-
+def slidingWindowDetection(clf,imageMatri,outputPic):
+	imageMatrix = np.array(imageMatri)
 	rows = len(imageMatrix)
 	cols =  len(imageMatrix[0])
 	count = 0
@@ -33,17 +33,15 @@ def slidingWindowDetection(clf,imageMatrix,outputPic):
 	for row in range(0,rows-patchSize,10):
 		for col in range(0,cols-patchSize,10):
 			#make imageVector
-			imageVector = []
-			for r in range(row,row+patchSize):
-				for c in range(col,col+patchSize):
-					imageVector.append(imageMatrix[r][c])
-			imageVector =  np.array(imageVector).reshape(20,20)
+			imageVector = imageMatrix[row:row+patchSize,col:col+patchSize]
+
 			imageVector = digitalImagePrep(imageVector, "fname").reshape(1,400)[0]*255
 			a = clf.predict_proba([imageVector])[0]
 			best = max(a)
-			pathcesToKeep.append([[row,col],best])
+			if best != min(a):
+				pathcesToKeep.append([[row,col],best])
 			count +=1
-			if count %10 == 0:
+			if count % 10 == 0:
 				print count
 
 	#find top numberToDetect best:
@@ -64,7 +62,7 @@ def slidingWindowDetection(clf,imageMatrix,outputPic):
 
 def makePictureFromMatrix(imageMatrix):
 	array = np.array(imageMatrix)
-	result = Image.fromarray((array ).astype(np.uint8))
+	result = Image.fromarray((array).astype(np.uint8))
 	result.save('out.bmp')
 
 output = slidingWindowDetection(clf,reader.imageMatrix,outputPic)
