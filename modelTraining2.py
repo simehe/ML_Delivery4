@@ -41,7 +41,6 @@ def prepareTrainandTestSet():
             indexRemember = j
             y.append(i)
             X.append(reader.imageVector[j])
-            print(X)
         reader.clearVector()
         reader.count = indexRemember + 1
         reader.readImage(inputTest)
@@ -50,6 +49,15 @@ def prepareTrainandTestSet():
             testSetRemember.append(i)
         reader.clearVector()
         reader.count = 0
+    for i in range(300):
+        whiteImage = []
+        for i in range(400):
+            whiteImage.append(255)
+        X.append(whiteImage)
+        y.append(26)
+    scaler = preprocessing.StandardScaler().fit(X)
+    scaler.transform(X)
+    scaler.transform(testSetAll)
 
 
 def classify():
@@ -67,9 +75,9 @@ prepareTrainandTestSet()
 ### DIFFERENT CLASSIFIERS ###
 #clf = OneVsRestClassifier(estimator=SVC(random_state=0))
 #clf = OneVsRestClassifier(LinearSVC(C=100.))
-#clf = RandomForestClassifier(n_estimators=200)
+clf = RandomForestClassifier(n_estimators=200)
 #clf = GaussianNB()
-clf = MLPClassifier(solver='adam', alpha=1e-05, hidden_layer_sizes=(600, 600, 600))
+#clf = MLPClassifier(solver='adam', alpha=1e-05, hidden_layer_sizes=(600, 600, 600))
 #clf = tree.DecisionTreeClassifier()
 
 ### FIT TO TRAINING DATA ###

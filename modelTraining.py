@@ -41,7 +41,6 @@ def prepareTrainandTestSet():
             indexRemember = j
             y.append(i)
             X.append(reader.imageVector[j])
-            print(X)
         reader.clearVector()
         reader.count = indexRemember + 1
         reader.readImage(inputTest)
