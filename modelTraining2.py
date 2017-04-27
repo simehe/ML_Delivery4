@@ -2,32 +2,30 @@ from imageReading import ImageReader
 import math
 from sklearn import preprocessing
 
-### ONE VS REST ###
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.svm import SVC
-from sklearn.svm import LinearSVC
+### NN ###
 from sklearn.neural_network import MLPClassifier
 
 ### FOREST ###
 from sklearn.ensemble import RandomForestClassifier
-from sklearn import tree
-
-## NAIVE BAYES ##
-from sklearn.naive_bayes import GaussianNB
-
 
 ## CONSTANTS ##
-ARRAY = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-TESTSET = 0.2
+ARRAY = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
+         "w", "x", "y", "z"]
 y = []
 X = []
 reader = ImageReader("mlImageHolder/")
+clf = 0
+scaler = 0
 
-
-## FOR TESTING ###
+## FOR TESTING ##
 testSetRemember = []
 testSetAll = []
 
+## MODE ##
+MODE = 1  # Mode = 1 -> Random Forest. Mode = 2 -> Neural Network
+
+
+### PREPARES THE DIFFERENT SETS FROM IMAGE ###
 def prepareTrainandTestSet():
     global X
     global testSetAll
@@ -51,7 +49,7 @@ def prepareTrainandTestSet():
         reader.count = 0
     for i in range(300):
         whiteImage = []
-        for i in range(400):
+        for j in range(400):
             whiteImage.append(255)
         X.append(whiteImage)
         y.append(26)
@@ -70,23 +68,33 @@ def classify():
     total = 1 - (float(missedCount) / float(len(results)))
     print("Overall achievement was: ", total)
 
-prepareTrainandTestSet()
 
-### DIFFERENT CLASSIFIERS ###
-#clf = OneVsRestClassifier(estimator=SVC(random_state=0))
-#clf = OneVsRestClassifier(LinearSVC(C=100.))
-clf = RandomForestClassifier(n_estimators=200)
-#clf = GaussianNB()
-#clf = MLPClassifier(solver='adam', alpha=1e-05, hidden_layer_sizes=(600, 600, 600))
-#clf = tree.DecisionTreeClassifier()
+def train():
+    global clf
+    prepareTrainandTestSet()
 
-### FIT TO TRAINING DATA ###
-clf.fit(X, y)
+    ### DIFFERENT CLASSIFIERS ###
+    if (MODE == 1):
+        clf = RandomForestClassifier(n_estimators=200)
+    else:
+        clf = MLPClassifier(solver='adam', alpha=1e-05, hidden_layer_sizes=(300, 300, 300))
 
-print("The model is built")
+    ### FIT TO TRAINING DATA ###
+    clf.fit(X, y)
 
-### TEST ON TEST SET ###
-classify()
+    print("The model is built")
+
+
+def test():
+    ### TEST ON TEST SET ###
+    classify()
+
+
+train()
+test()
+
+
+
 
 
 

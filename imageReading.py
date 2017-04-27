@@ -6,6 +6,7 @@ from skimage import io
 
 class ImageReader:
 
+    # NEEDS TO BE INITATED WITH THE ACCEPTABLE FOLDER
     def __init__(self, imageFolder):
         self.imageFolder = imageFolder
         self.sizeX = 20
@@ -14,6 +15,7 @@ class ImageReader:
         self.imageVector = []
         self.imageHolder = []
 
+    ### INPUT -> BASIS ADRESS FOR EACH IMAGE
     def readImage(self, letter):
         source = self.imageFolder + letter
         nextImage = True

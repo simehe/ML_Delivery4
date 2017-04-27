@@ -1,33 +1,35 @@
+### HOW TO RUN ###
+
+# 1 RUN ImagePreProcessing to generate the preprocessed and augmented dataset
+# 2 RUN ModelTraining
+
 from imageReading import ImageReader
 import math
 from sklearn import preprocessing
 
-### ONE VS REST ###
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.svm import SVC
-from sklearn.svm import LinearSVC
+### NN ###
 from sklearn.neural_network import MLPClassifier
 
 ### FOREST ###
 from sklearn.ensemble import RandomForestClassifier
-from sklearn import tree
-
-## NAIVE BAYES ##
-from sklearn.naive_bayes import GaussianNB
-
 
 ## CONSTANTS ##
 ARRAY = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-TESTSET = 0.2
 y = []
 X = []
 reader = ImageReader("mlImageHolder/")
+clf = 0
+scaler = 0
 
-
-## FOR TESTING ###
+## FOR TESTING ##
 testSetRemember = []
 testSetAll = []
 
+## MODE ##
+MODE = 1 # Mode = 1 -> Random Forest. Mode = 2 -> Neural Network
+
+
+### PREPARES THE DIFFERENT SETS FROM IMAGE ###
 def prepareTrainandTestSet():
     global X
     global testSetAll
@@ -49,6 +51,9 @@ def prepareTrainandTestSet():
             testSetRemember.append(i)
         reader.clearVector()
         reader.count = 0
+    scaler = preprocessing.StandardScaler().fit(X)
+    scaler.transform(X)
+    scaler.transform(testSetAll)
 
 
 def classify():
@@ -61,23 +66,31 @@ def classify():
     total = 1 - (float(missedCount) / float(len(results)))
     print("Overall achievement was: ", total)
 
-prepareTrainandTestSet()
+def train():
+    global clf
+    prepareTrainandTestSet()
 
-### DIFFERENT CLASSIFIERS ###
-#clf = OneVsRestClassifier(estimator=SVC(random_state=0))
-#clf = OneVsRestClassifier(LinearSVC(C=100.))
-#clf = RandomForestClassifier(n_estimators=200)
-#clf = GaussianNB()
-clf = MLPClassifier(solver='adam', alpha=1e-05, hidden_layer_sizes=(600, 600, 600))
-#clf = tree.DecisionTreeClassifier()
+    ### DIFFERENT CLASSIFIERS ###
+    if(MODE == 1):
+        clf = RandomForestClassifier(n_estimators=200)
+    else:
+        clf = MLPClassifier(solver='adam', alpha=1e-05, hidden_layer_sizes=(300, 300, 300))
 
-### FIT TO TRAINING DATA ###
-clf.fit(X, y)
+    ### FIT TO TRAINING DATA ###
+    clf.fit(X, y)
 
-print("The model is built")
+    print("The model is built")
 
-### TEST ON TEST SET ###
-classify()
+def test():
+
+    ### TEST ON TEST SET ###
+    classify()
+
+train()
+test()
+
+
+
 
 
 

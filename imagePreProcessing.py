@@ -32,9 +32,9 @@ def digitalImagePrep(image, image_name, mode):
     image = increaseContrast(image)
 
     # Augment the picture, dependent on mode
-    if (mode == 0):
+    if (mode == 0 or mode == 3):
         image = smoothen(image)
-    elif(mode == 1):
+    elif(mode == 1 or mode == 4):
         image = sharpen(image)
 
 
@@ -43,9 +43,10 @@ def digitalImagePrep(image, image_name, mode):
     print(shareOfWhitePixels(image, image_name) > INVERSION_THRESHOLD_CONTENT)
 
     # Invert image if necessary
-    if shareOfWhiteFramePixels(image, image_name) > INVERSION_THRESHOLD_FRAME or shareOfWhitePixels(image,
+    if (mode == 0 or mode == 1 or mode == 2):
+        if shareOfWhiteFramePixels(image, image_name) > INVERSION_THRESHOLD_FRAME or shareOfWhitePixels(image,
                                                                                                     image_name) > INVERSION_THRESHOLD_CONTENT:
-        image = invert(image)
+            image = invert(image)
 
     return image
 
@@ -116,8 +117,8 @@ def tester():
             print("Error")
 
 
+### PREPARES IMAGES ###
 def main():
-    #
     chars = string.ascii_lowercase[:]  # List of chars a-z
     reader = ImageReader("chars74k-lite/")
 
@@ -135,6 +136,8 @@ def main():
         except OSError as exception:
             print "\nBE CAREFUL! Directory %s already exists." % saveDestination2
         counter = 0
+
+        # SORT OUT TRAINING/TEST SET
         numberOfTrainingImages = int(len(images) * TRAININGSET)
         for i in range(numberOfTrainingImages):  # Here, I want modify and save each image
             fname1 = c + "_" + str(counter) + ".jpg"
@@ -143,15 +146,31 @@ def main():
             counter += 1
             fname3 = c + "_" + str(counter) + ".jpg"
             counter += 1
+            fname4 = c + "_" + str(counter) + ".jpg"
+            counter += 1
+            fname5 = c + "_" + str(counter) + ".jpg"
+            counter += 1
+            fname6 = c + "_" + str(counter) + ".jpg"
+            counter += 1
             prepped = digitalImagePrep(images[i], fname1, 0)  # Image preprocessing
             prepped2 = digitalImagePrep(images[i], fname2, 1)
             prepped3 = digitalImagePrep(images[i], fname3, 2)
+            prepped4 = digitalImagePrep(images[i], fname4, 3)
+            prepped5 = digitalImagePrep(images[i], fname5, 4)
+            prepped6 = digitalImagePrep(images[i], fname6, 5)
             saveDestination1 = "mlImageHolder/" + c + "/" + fname1
             saveDestination2 = "mlImageHolder/" + c + "/" + fname2
             saveDestination3 = "mlImageHolder/" + c + "/" + fname3
+            saveDestination4 = "mlImageHolder/" + c + "/" + fname4
+            saveDestination5 = "mlImageHolder/" + c + "/" + fname5
+            saveDestination6 = "mlImageHolder/" + c + "/" + fname6
             io.imsave(saveDestination1, prepped)
             io.imsave(saveDestination2, prepped2)
             io.imsave(saveDestination3, prepped3)
+            io.imsave(saveDestination4, prepped4)
+            io.imsave(saveDestination5, prepped5)
+            io.imsave(saveDestination6, prepped6)
+        # PREPARES THE TEST SET
         for i in range(numberOfTrainingImages, len(images)):
             fname = c + "_" + str(counter) + ".jpg"
             counter += 1
