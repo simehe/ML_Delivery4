@@ -1,6 +1,7 @@
 from imageReading import ImageReader
 import math
 from sklearn import preprocessing
+from sklearn.externals import joblib
 
 ### NN ###
 from sklearn.neural_network import MLPClassifier
@@ -89,9 +90,13 @@ def test():
     ### TEST ON TEST SET ###
     classify()
 
+def save():
+    # Can be accessed through clf = joblib.load('finishedModel.pkl')
+    joblib.dump(clf, 'finishedModel.pkl')
 
 train()
 test()
+save()
 
 
 
