@@ -45,8 +45,8 @@ def slidingWindowDetection(clf,scaler,imageMatri,outputPic):
 			a = clf.predict_proba([imageVector])[0][:-1]
 
 			best = max(a)
-			
-			pathcesToKeep.append([[row,col],best])
+			letterIndex = np.where(a==best)[0][0]
+			pathcesToKeep.append([[row,col],best,ARRAY[letterIndex]])
 			count += 1
 			if count % 10 == 0:
 				print count
@@ -60,12 +60,12 @@ def slidingWindowDetection(clf,scaler,imageMatri,outputPic):
 	while count != numberToDetect:
 		try:
 			new = pathcesToKeep[-1]
-			coor,prob = new
+			coor,prob,letter = new
 			row,col = coor[0],coor[1]
 			pathcesToKeep = pathcesToKeep[:-1]
 			notAllowed = False
 			#check if patch is close to already added patch
-			for coor2,p2 in patchesKept:
+			for coor2,p2,letter2 in patchesKept:
 				r2,c2 = coor2[0],coor2[1]
 				if abs(r2-row) < patchSize and abs(c2-col)  < patchSize:
 					notAllowed = True
@@ -77,9 +77,8 @@ def slidingWindowDetection(clf,scaler,imageMatri,outputPic):
 				patchesKept.append(new)
 		except:
 			break
-	for coor,prob in patchesKept:
+	for coor,prob,letter in patchesKept:
 		row,col = coor[0],coor[1]
-		
 		for c in range(col,col+patchSize):
 			outputPic[row][c]=0
 			outputPic[row+patchSize][c]=0
