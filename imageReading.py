@@ -10,6 +10,7 @@ class ImageReader:
         self.imageFolder = imageFolder
         self.sizeX = 20
         self.sizeY = 20
+        self.count = 0
         self.imageVector = []
         self.imageHolder = []
         self.imageMatrix = []
@@ -17,7 +18,7 @@ class ImageReader:
     def readImage(self, letter):
         source = self.imageFolder + letter
         nextImage = True
-        count = 0
+        count = self.count
         while(nextImage):
             try:
                 lett = letter[0] + "_" + str(count) + ".jpg"

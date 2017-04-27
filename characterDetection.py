@@ -1,6 +1,6 @@
 #character detection
 from imageReading import ImageReader
-import modelTraining
+import modelTraining2
 from copy import deepcopy
 import string
 import numpy as np
@@ -16,43 +16,50 @@ reader.readImageFromFileName(imageName)
 
 patchSize = 20 #x20
 #print reader.imageVector
-numberToDetect = 6
+numberToDetect = 8
 
 #bruk classify som tar inn imageMatrix og returnerer et element i ARRAY
 
 outputPic  = deepcopy(reader.imageMatrix)
-clf = modelTraining.train()
+clf,scaler = modelTraining2.train()
 
-def slidingWindowDetection(clf,imageMatri,outputPic):
+def slidingWindowDetection(clf,scaler,imageMatri,outputPic):
 	imageMatrix = np.array(imageMatri)
 	rows = len(imageMatrix)
 	cols =  len(imageMatrix[0])
 	count = 0
 	pathcesToKeep = []
 	worstAmongNumbersToCheck = 0
-	for row in range(0,rows-patchSize,10):
-		for col in range(0,cols-patchSize,10):
+	for row in range(0,rows-patchSize,7):
+		for col in range(0,cols-patchSize,7):
 			#make imageVector
-			imageVector = imageMatrix[row:row+patchSize,col:col+patchSize]
-
-			imageVector = digitalImagePrep(imageVector, "fname").reshape(1,400)[0]*255
-			a = clf.predict_proba([imageVector])[0]
+			imageVector = imageMatrix[row:row+patchSize,col:col+patchSize].reshape(1,400)[0]
+			#imageVector = digitalImagePrep(imageVector, "fname",2).reshape(1,400)[0]*255
+			
+			if imageVector.max()==imageVector.min():
+				continue
+			scaler.transform([imageVector])
+			a = clf.predict_proba([imageVector])[0][:-1]
+			
 			best = max(a)
-			if best != min(a):
-				pathcesToKeep.append([[row,col],best])
-			count +=1
+			pathcesToKeep.append([[row,col],best])
+			count += 1
 			if count % 10 == 0:
 				print count
-
 	#find top numberToDetect best:
 
 	pathcesToKeep.sort(key = lambda x : x[1])
 	pathcesToKeep =  pathcesToKeep[-1-numberToDetect:-1]
 	for coor,prob in pathcesToKeep:
 		row,col = coor[0],coor[1]
+		
+		for c in range(col,col+patchSize):
+			outputPic[row][c]=0
+			outputPic[row+patchSize][c]=0
+
 		for r in range(row,row+patchSize):
-			for c in range(col,col+patchSize):
-				outputPic[r][c]=0
+			outputPic[r][col]=0
+			outputPic[r][col+patchSize]=0
 
 
 
@@ -65,7 +72,7 @@ def makePictureFromMatrix(imageMatrix):
 	result = Image.fromarray((array).astype(np.uint8))
 	result.save('out.bmp')
 
-output = slidingWindowDetection(clf,reader.imageMatrix,outputPic)
+output = slidingWindowDetection(clf,scaler,reader.imageMatrix,outputPic)
 makePictureFromMatrix(outputPic)
 
 
